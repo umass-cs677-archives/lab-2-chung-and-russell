@@ -52,7 +52,7 @@ def _filter_by_item(book_info, item_id):
     :return: dictionary that stores the cost and number of items in stock for a book with item_id
     """
 
-    item_info = {"cost" : book_info[item_id][3], "number in stock": book_info[item_id][2]}
+    item_info = {"cost" : int(book_info[item_id][3]), "number in stock": int(book_info[item_id][2])}
 
     return item_info
 
@@ -73,12 +73,24 @@ def query(**kwargs):
         book_name = book_info[kwargs[key]][1]
         query_result = jsonify({book_name: filter_result})
 
-
     return query_result
 
-@app.route("/lookup", methods=['GET'])
-def update():
-    print("")
+@app.route("/update/<field>/<operation>/<int:number>", methods=['PUT'])
+def update(field, operation, number):
+    """
+
+    Update field using given operation and number
+
+    :param name: name of the field to update
+    :param operation: three operations are supported. increase, decrease, and set
+    :param number: number to be used in operation
+    :return: status code
+    """
+
+
+
+    print("hi")
+
 
 
 if __name__ == "__main__":
