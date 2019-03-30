@@ -19,7 +19,7 @@ def _load_books(db_name):
         #First line is column names so we toss it
         for line in lines[1:]:
             col = re.split(",\s*", line.replace("\n",""))
-            book_info[col[0]] = tuple(col[i] for i in range(1,len(col)))
+            book_info[int(col[0])] = tuple(col[i] for i in range(1,len(col)))
 
     return book_info
 
@@ -31,29 +31,31 @@ def _filter_by_topic(book_info, topic):
     :param topic: a string that specified the topic of interest
     :return: dictionary that maps bookname to its id
     """
-    sorted_books = {}
+    filtered_books = {}
     topic = topic.lower()
 
     for book_id , info in book_info.items():
         book_topic = info[0].lower().replace(" ", "")
         book_name = info[1]
-        
+
         if book_topic == topic:
-            sorted_books[book_name] = book_id
+            filtered_books[book_name] = book_id
 
-    return sorted_books
+    return filtered_books
 
-# def _filter_by_item(book_info, item_id):
-#     """
-#      Return cost and number of items in stocks for a book with item_id
-#
-#     :param book_info: list of tuples that contain information of books
-#     :param item_id: unique id for the book
-#     :return: dictionary that stores the cost and number of items in stock for a book with item_id
-#     """
-#
-#     for book in book_info:
-#
+def _filter_by_item(book_info, item_id):
+    """
+     Return cost and number of items in stocks for a book with item_id
+
+    :param book_info: dictionary that stores information of all items
+    :param item_id: unique id for the book
+    :return: dictionary that stores the cost and number of items in stock for a book with item_id
+    """
+
+    item_info = {"cost" : book_info[item_id][3], "number in stock": book_info[item_id][2]}
+
+    return item_info
+
 
 @app.route("/query/<topic>", methods=['GET'])
 @app.route("/query/<int:item_number>", methods=['GET'])
@@ -63,12 +65,16 @@ def query(**kwargs):
     book_info = _load_books("inventory")
 
     if key == "topic":
-        filtered_book = _filter_by_topic(book_info, kwargs[key])
-        search_result = jsonify(items = filtered_book)
-        return search_result
+        filter_result = _filter_by_topic(book_info, kwargs[key])
+        query_result = jsonify(items=filter_result)
 
     elif key == "item_number":
-        return "hey"
+        filter_result = _filter_by_item(book_info, kwargs[key])
+        book_name = book_info[kwargs[key]][1]
+        query_result = jsonify({book_name: filter_result})
+
+
+    return query_result
 
 @app.route("/lookup", methods=['GET'])
 def update():
