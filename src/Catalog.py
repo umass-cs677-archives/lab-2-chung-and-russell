@@ -46,8 +46,8 @@ def _filter_by_topic(book_info, topic):
     return sorted_books
 
 
-@app.route("/search/<topic>", methods=['GET'])
-@app.route("/lookup/<item_number>", methods=['GET'])
+@app.route("/query/<topic>", methods=['GET'])
+@app.route("/query/<int:item_number>", methods=['GET'])
 def query(**kwargs):
 
     key = list(kwargs)[0]
