@@ -1,27 +1,23 @@
 import re
-from flask import Flask, request, jsonify
+import sqlite3
+from flask import Flask, request, jsonify, abort, g
 
 app = Flask("catalog")
+DATABASE = 'inventory.db'
 
-def _load_books(db_name):
-    """
-    This function takes the database name and convert the content to a dictionary
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+    return db
 
-    :param db_name: data base name
-    :return: dictionary with ID as key and a tuple that stores information of a book as value
-    """
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
-    book_info = {}
 
-    with open(db_name) as f:
-        lines = f.readlines()
-
-        #First line is column names so we toss it
-        for line in lines[1:]:
-            col = re.split(",\s*", line.replace("\n",""))
-            book_info[int(col[0])] = tuple(col[i] for i in range(1,len(col)))
-
-    return book_info
 
 def _filter_by_topic(book_info, topic):
     """
@@ -73,10 +69,13 @@ def query(**kwargs):
         book_name = book_info[kwargs[key]][1]
         query_result = jsonify({book_name: filter_result})
 
+    else:
+        return "no query criteria specified"
+
     return query_result
 
-@app.route("/update/<field>/<operation>/<int:number>", methods=['PUT'])
-def update(field, operation, number):
+@app.route("/update/<item_id>/<field>/<operation>/<int:number>", methods=['PUT'])
+def update(item_id, field, operation, number = 1):
     """
 
     Update field using given operation and number
@@ -86,14 +85,20 @@ def update(field, operation, number):
     :param number: number to be used in operation
     :return: status code
     """
+    book_info = _filter_by_item(_load_books("inventory"), item_id)
 
+    valid_fields = ["cost", "quantity"]
+    valid_operation = ["increase", "decrease", "set"]
 
+    if field not in valid_fields:
+        abort(400)
 
-    print("hi")
+    if operation not in valid_operation:
+        abort(400)
+
 
 
 
 if __name__ == "__main__":
-
     app.run(use_debugger = False, use_reloader = False, debug = True)
 
