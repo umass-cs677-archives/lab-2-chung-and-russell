@@ -115,4 +115,4 @@ api.add_resource(Buy, '/orders/<catalog_id>')
 if __name__ == '__main__':
     # reset the order DB when starting the flask app
     reset_orders()
-    app.run( debug=True)
+    app.run(host = '0.0.0.0', port = 8080, debug=True)

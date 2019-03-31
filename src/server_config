@@ -1,0 +1,6 @@
+Server, Machine, IP, Port
+Order, elnux1, 128.119.243.147, 8080
+Catalog, elnux2, 128.119.243.164, 8080
+Frontend, elnux3, 128.119.243.168, 8080
+Client, elnux7, 128.119.243.175, 8080
+
