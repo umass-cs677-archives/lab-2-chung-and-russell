@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import jsonify
 from flask_restful import reqparse, abort, Api, Resource
 import csv
 import random
@@ -7,34 +8,39 @@ import time
 app = Flask(__name__)
 api = Api(app)
 
-# initialize order database as a local .txt file
-with open('order_log.txt', mode='w') as order_log:
-    fieldnames = ['order_id', 'processing_time','is_successful','catalog_id']
-    writer = csv.DictWriter(order_log, fieldnames=fieldnames)
+ORDER_FILE = 'order_log.txt'
 
-    writer.writeheader()
-    # TODO: has some dummy orders for now.  for submission, order log should be empty
-    writer.writerow({'order_id': 1, 'processing_time': .123, 'is_successful': True, 'catalog_id': 345})
-    writer.writerow({'order_id': 2, 'processing_time': .023, 'is_successful': False,'catalog_id': 359})
-    writer.writerow({'order_id': 3, 'processing_time': .023, 'is_successful': False,'catalog_id': 359})
-    order_log.close()
+#######################################################
+#### Helper functions for read/writing to order DB ####
+#######################################################
+def reset_orders():
+    # initialize order database as a local .txt file
+    with open(ORDER_FILE, mode='w') as order_log:
+        fieldnames = ['order_id', 'processing_time','is_successful','catalog_id']
+        writer = csv.DictWriter(order_log, fieldnames=fieldnames)
+
+        writer.writeheader()
+        # TODO: has some dummy orders for now.  for submission, order log should be empty
+        writer.writerow({'order_id': 1, 'processing_time': .123, 'is_successful': True, 'catalog_id': 345})
+        writer.writerow({'order_id': 2, 'processing_time': .023, 'is_successful': False,'catalog_id': 359})
+        writer.writerow({'order_id': 3, 'processing_time': .023, 'is_successful': False,'catalog_id': 359})
+        order_log.close()
 
 
 def get_orders_as_dict():
-    orders = {}
-    with open('order_log.txt', mode='r') as csv_file:
+    #orders = {}
+    with open(ORDER_FILE, mode='r') as csv_file:
         csv_reader = csv.DictReader(csv_file)
-        for row in csv_reader:
-            orders[row["order_id"]] = {"processing_time": row["processing_time"],
-                                        "is_successful": row["is_successful"],
-                                        "catalog_id": row["catalog_id"]}
-    return orders
+        return [row for row in csv_reader]
+        #for row in csv_reader:
+        #    orders[row["order_id"]] = {"processing_time": row["processing_time"],
+        #                                "is_successful": row["is_successful"],
+        #                                "catalog_id": row["catalog_id"]}
+    #return orders
 
 def get_num_orders():
-    with open('order_log.txt', mode='r') as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        rows = [row for row in csv_reader]
-        return len(rows)
+    orders = get_orders_as_dict()
+    return len(orders)
 
 def create_order(order_id,processing_time,is_successful,catalog_id):
     return {'order_id': order_id,
@@ -43,13 +49,15 @@ def create_order(order_id,processing_time,is_successful,catalog_id):
             'catalog_id': catalog_id}
 
 def write_order(order):
-    with open('order_log.txt', mode='a') as order_log:
+    with open(ORDER_FILE, mode='a') as order_log:
         fieldnames = ['order_id', 'processing_time','is_successful','catalog_id']
         writer = csv.DictWriter(order_log, fieldnames=fieldnames)
         print(type(order))
         writer.writerow(order)
 
-
+#######################################################
+######## Functions for querying catalog server ########
+#######################################################
 
 parser = reqparse.RequestParser()
 parser.add_argument('catalog_id', type = int, help = 'Catalog ID for item to buy')
@@ -65,6 +73,10 @@ def decrement_catalog_server(catalog_id):
     timeDelay = random.randrange(0, 2)
     time.sleep(timeDelay)
 
+
+######################################################
+################ Setup REST resources ################
+######################################################
 
 # Buy
 # submit a single buy request
@@ -91,23 +103,26 @@ class Buy(Resource):
         return(order)
 
 
-
-
 # OrderList
 # shows a list of all orders
 class OrderList(Resource):
     def get(self):
         orders = get_orders_as_dict()
-        return orders
+        return jsonify(orders)
+    
+    def reset(self):
+        reset_orders()
+        orders = get_orders_as_dict()
+        return jsonify(orders)
 
 ##
-## Actually setup the Api resource routing here
+## setup the Api resource routing here
 ##
 api.add_resource(OrderList, '/orders')
 api.add_resource(Buy, '/orders/<catalog_id>')
 
 
 
-
+# TODO setup public flask server
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run( debug=True)
