@@ -5,11 +5,51 @@ from flask import Flask, request, jsonify, abort, g
 app = Flask("catalog")
 DATABASE = 'inventory.db'
 
-def get_db():
+def _get_db():
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
+
+    def make_dicts(cursor, row):
+        return dict((cursor.description[idx][0], value)
+                    for idx, value in enumerate(row))
+
+    db.row_factory = make_dicts
+
     return db
+
+def _pair_results(query_results, fields_to_pair):
+    """
+    It pairs up entries of the dictionaries in the query result. For example, two dictionaries {a : "book1", b : 10} {a : "book2", b : 25}
+    will be packed into one dictionary {"book1" : 10, "book2" : 25}
+
+    :param query_results: A list of dictionaries. All dictionaries must have the same keys or the function will fail
+    :param fields_to_pair: list of tuples of string that specify what entries in a dictionary to pair up
+
+    :return: a dictionary that has values of the paired fields as keys and values
+    """
+
+    paired_dict = {}
+
+    for query_result in query_results:
+
+        for pair in fields_to_pair:
+            new_key = query_result[pair[0]]
+            new_value = query_result[pair[1]]
+
+            paired_dict[new_key] = new_value
+
+    return paired_dict
+
+def _delete_keys(dict, keys):
+    """
+    Delete specifed keys from the dictionary
+    """
+    for key in keys:
+        del dict[key]
+
+    return dict
+
 
 @app.teardown_appcontext
 def close_connection(exception):
@@ -19,60 +59,29 @@ def close_connection(exception):
 
 
 
-def _filter_by_topic(book_info, topic):
-    """
-    Return names and IDs of books with specified topic
-
-    :param book_info: list of tuples that contain information of books
-    :param topic: a string that specified the topic of interest
-    :return: dictionary that maps bookname to its id
-    """
-    filtered_books = {}
-    topic = topic.lower()
-
-    for book_id , info in book_info.items():
-        book_topic = info[0].lower().replace(" ", "")
-        book_name = info[1]
-
-        if book_topic == topic:
-            filtered_books[book_name] = book_id
-
-    return filtered_books
-
-def _filter_by_item(book_info, item_id):
-    """
-     Return cost and number of items in stocks for a book with item_id
-
-    :param book_info: dictionary that stores information of all items
-    :param item_id: unique id for the book
-    :return: dictionary that stores the cost and number of items in stock for a book with item_id
-    """
-
-    item_info = {"cost" : int(book_info[item_id][3]), "number in stock": int(book_info[item_id][2])}
-
-    return item_info
-
 
 @app.route("/query/<topic>", methods=['GET'])
 @app.route("/query/<int:item_number>", methods=['GET'])
 def query(**kwargs):
 
     key = list(kwargs)[0]
-    book_info = _load_books("inventory")
+    cursor = _get_db().cursor()
 
     if key == "topic":
-        filter_result = _filter_by_topic(book_info, kwargs[key])
-        query_result = jsonify(items=filter_result)
+        topic = (kwargs[key].replace("_", " "),)
+        query_results = cursor.execute("SELECT name, id FROM books WHERE topic = ?", topic).fetchall()
+        query_results = _pair_results(query_results, [("NAME", "ID")])
+        response = jsonify(items=query_results)
 
     elif key == "item_number":
-        filter_result = _filter_by_item(book_info, kwargs[key])
-        book_name = book_info[kwargs[key]][1]
-        query_result = jsonify({book_name: filter_result})
+        query_result = cursor.execute("SELECT name, cost, quantity FROM books WHERE id = ?", str(kwargs[key])).fetchall()
+        book_name = query_result[0]["NAME"]
+        response = jsonify({book_name: _delete_keys(query_result[0],["NAME"])})
 
     else:
         return "no query criteria specified"
 
-    return query_result
+    return response
 
 @app.route("/update/<item_id>/<field>/<operation>/<int:number>", methods=['PUT'])
 def update(item_id, field, operation, number = 1):
@@ -85,7 +94,6 @@ def update(item_id, field, operation, number = 1):
     :param number: number to be used in operation
     :return: status code
     """
-    book_info = _filter_by_item(_load_books("inventory"), item_id)
 
     valid_fields = ["cost", "quantity"]
     valid_operation = ["increase", "decrease", "set"]
@@ -96,9 +104,14 @@ def update(item_id, field, operation, number = 1):
     if operation not in valid_operation:
         abort(400)
 
+    cursor = _get_db().cursor()
+
+    
+
 
 
 
 if __name__ == "__main__":
+
     app.run(use_debugger = False, use_reloader = False, debug = True)
 
