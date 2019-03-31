@@ -18,25 +18,13 @@ def reset_orders():
     with open(ORDER_FILE, mode='w') as order_log:
         fieldnames = ['order_id', 'processing_time','is_successful','catalog_id']
         writer = csv.DictWriter(order_log, fieldnames=fieldnames)
-
         writer.writeheader()
-        # TODO: has some dummy orders for now.  for submission, order log should be empty
-        writer.writerow({'order_id': 1, 'processing_time': .123, 'is_successful': True, 'catalog_id': 345})
-        writer.writerow({'order_id': 2, 'processing_time': .023, 'is_successful': False,'catalog_id': 359})
-        writer.writerow({'order_id': 3, 'processing_time': .023, 'is_successful': False,'catalog_id': 359})
         order_log.close()
 
-
 def get_orders_as_dict():
-    #orders = {}
     with open(ORDER_FILE, mode='r') as csv_file:
         csv_reader = csv.DictReader(csv_file)
         return [row for row in csv_reader]
-        #for row in csv_reader:
-        #    orders[row["order_id"]] = {"processing_time": row["processing_time"],
-        #                                "is_successful": row["is_successful"],
-        #                                "catalog_id": row["catalog_id"]}
-    #return orders
 
 def get_num_orders():
     orders = get_orders_as_dict()
@@ -110,7 +98,7 @@ class OrderList(Resource):
         orders = get_orders_as_dict()
         return jsonify(orders)
     
-    def reset(self):
+    def delete(self):
         reset_orders()
         orders = get_orders_as_dict()
         return jsonify(orders)
@@ -125,4 +113,6 @@ api.add_resource(Buy, '/orders/<catalog_id>')
 
 # TODO setup public flask server
 if __name__ == '__main__':
+    # reset the order DB when starting the flask app
+    reset_orders()
     app.run( debug=True)
