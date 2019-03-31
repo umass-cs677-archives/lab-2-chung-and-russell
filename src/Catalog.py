@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask, request, jsonify, abort, g
+from flask import Flask, redirect, jsonify, abort, g
 
 app = Flask("catalog")
 DATABASE = 'inventory.db'
@@ -80,19 +80,20 @@ def query(**kwargs):
     return response
 
 @app.route("/update/<item_number>/<field>/<operation>/<number>", methods=['GET','PUT'])
-def update(item_number, field, operation, number = "1"):
+def update(item_number, field, operation, number):
     """
 
-    Update field using given operation and number
+    Update field using given operation and number. A successful update will automatically
+    redirect to /query/item_number and displays the updated item info
 
     :param name: name of the field to update
     :param operation: three operations are supported. increase, decrease, and set
     :param number: number to be used in operation
-    :return: status code
+    :return: updated json object
     """
 
     valid_fields = ["cost", "quantity"]
-    valid_operation = ["increase", "decrease", "set"]
+    valid_operation = {"increase":"+", "decrease":"-", "set":""}
 
     #Checking fields for validation also prevents SQL injection attack, so it's safe to concatenate <field> to the query
     if field not in valid_fields:
@@ -104,11 +105,14 @@ def update(item_number, field, operation, number = "1"):
     conn = get_db()
     cursor = conn.cursor()
 
-    if operation == "increase":
-        cursor.execute("UPDATE books SET " + field + "=" + field + "+ ? WHERE ID = ?", [number, str(item_number)])
+    if operation in ["increase", "decrease"]:
+        cursor.execute("UPDATE books SET " + field + "=" + field + valid_operation[operation] + " ? WHERE ID = ?", [number, str(item_number)])
         conn.commit()
-        return "hi"
+    elif operation == "set":
+        cursor.execute("UPDATE books SET " + field + "= ? WHERE ID = ?", [number, str(item_number)])
+        conn.commit()
 
+    return redirect("/query/"+item_number)
 
 if __name__ == "__main__":
 
