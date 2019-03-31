@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify, abort, g
 app = Flask("catalog")
 DATABASE = 'inventory.db'
 
-def _get_db():
+def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
@@ -17,6 +17,12 @@ def _get_db():
     db.row_factory = make_dicts
 
     return db
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 def _pair_results(query_results, fields_to_pair):
     """
@@ -51,21 +57,12 @@ def _delete_keys(dict, keys):
     return dict
 
 
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
-
-
-
-
 @app.route("/query/<topic>", methods=['GET'])
 @app.route("/query/<int:item_number>", methods=['GET'])
 def query(**kwargs):
 
     key = list(kwargs)[0]
-    cursor = _get_db().cursor()
+    cursor = get_db().cursor()
 
     if key == "topic":
         topic = (kwargs[key].replace("_", " "),)
@@ -83,8 +80,8 @@ def query(**kwargs):
 
     return response
 
-@app.route("/update/<item_id>/<field>/<operation>/<int:number>", methods=['PUT'])
-def update(item_id, field, operation, number = 1):
+@app.route("/update/<item_number>/<field>/<operation>/<number>", methods=['GET','PUT'])
+def update(item_number, field, operation, number = "1"):
     """
 
     Update field using given operation and number
@@ -98,17 +95,20 @@ def update(item_id, field, operation, number = 1):
     valid_fields = ["cost", "quantity"]
     valid_operation = ["increase", "decrease", "set"]
 
+    #Checking fields for validation also prevents SQL injection attack, so it's safe to concatenate <field> to the query
     if field not in valid_fields:
         abort(400)
 
     if operation not in valid_operation:
         abort(400)
 
-    cursor = _get_db().cursor()
+    conn = get_db()
+    cursor = conn.cursor()
 
-    
-
-
+    if operation == "increase":
+        cursor.execute("UPDATE books SET " + field + "=" + field + "+ ? WHERE ID = ?", [number, str(item_number)])
+        conn.commit()
+        return "hi"
 
 
 if __name__ == "__main__":
