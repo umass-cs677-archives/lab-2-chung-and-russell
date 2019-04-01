@@ -4,11 +4,33 @@ from flask_restful import reqparse, abort, Api, Resource
 import csv
 import random
 import time
+import requests
 
 app = Flask(__name__)
 api = Api(app)
 
 ORDER_FILE = 'order_log.txt'
+SERVER_CONFIG = 'src/server_config'
+
+#######################################################
+############### Accessing Catalog server  #############
+#######################################################
+
+with open(SERVER_CONFIG, mode ='r') as server_file:
+    server_dict = {}
+    csv_reader = csv.DictReader(server_file)
+    for row in csv_reader:
+        server_name = row['Server']
+        server_dict[server_name] = {'Machine': row['Machine'],
+                                    'IP': row['IP'],
+                                    'Port': row['Port']}
+    
+    catalog_dict = server_dict['Catalog']
+    catalog_IP = catalog_dict['IP']
+    catalog_port = catalog_dict['Port']
+
+CATALOG_ADDRESS = 'http://' + catalog_IP + ':' + catalog_port
+
 
 #######################################################
 #### Helper functions for read/writing to order DB ####
@@ -40,7 +62,6 @@ def write_order(order):
     with open(ORDER_FILE, mode='a') as order_log:
         fieldnames = ['order_id', 'processing_time','is_successful','catalog_id']
         writer = csv.DictWriter(order_log, fieldnames=fieldnames)
-        print(type(order))
         writer.writerow(order)
 
 #######################################################
@@ -50,16 +71,27 @@ def write_order(order):
 parser = reqparse.RequestParser()
 parser.add_argument('catalog_id', type = int, help = 'Catalog ID for item to buy')
 
-#TODO: integrate with catalog server API
-# until then, just wait a random amount of time
+# queries the catalog server, returns the quantity and title of the item
 def query_catalog_server(catalog_id):
-    timeDelay = random.randrange(0, 2)
-    time.sleep(timeDelay)
-    return random.randint(0,4)
+    r = requests.get(CATALOG_ADDRESS + '/query/' + catalog_id)
+    query_result = r.json()
+    # querying by ID gives a json of type {title:{'COST':value, 'QUANTITY':value}}
+    title = list(query_result.keys())[0]
+    item_dict = list(query_result.values())[0]
+    quantity = int(item_dict['QUANTITY'])
 
+    return quantity,title
+
+# decrements the catalog server, returns the new quantity and buying price of item
 def decrement_catalog_server(catalog_id):
-    timeDelay = random.randrange(0, 2)
-    time.sleep(timeDelay)
+    r = requests.get(CATALOG_ADDRESS + '/update/' + catalog_id + '/quantity/decrease/1')
+    decrement_result = r.json()
+    # updating by quantity gives a json of type {title:{'COST':value, 'QUANTITY':value}}
+    item_dict = list(decrement_result.values())[0]
+    quantity = int(item_dict['QUANTITY'])
+    cost = int(item_dict['COST'])
+
+    return quantity,cost
 
 
 ######################################################
@@ -73,22 +105,26 @@ class Buy(Resource):
     order = {}
     def get(self, catalog_id):
         start = time.time()
-        stock = query_catalog_server(catalog_id)
+        stock,title = query_catalog_server(catalog_id)
         processing_time = time.time() - start
         if stock == 0:
             # done querying the catalog server, add an order to the order DB
             order_id = get_num_orders() + 1
             is_successful = False
+            print("Failed to buy '" + title + "', stock was at 0")
             
         else:
             #decrement stock by 1
-            decrement_catalog_server(catalog_id)
+            newstock,cost = decrement_catalog_server(catalog_id)
             is_successful = True
             order_id = get_num_orders() + 1
+            print("Bought '"+ title + "' at price of " + str(cost) + ' , stock is now ' + str(newstock))
         
         order = create_order(order_id,processing_time,is_successful,catalog_id)
         write_order(order)
         return(order)
+
+
 
 
 # OrderList
@@ -107,7 +143,7 @@ class OrderList(Resource):
 ## setup the Api resource routing here
 ##
 api.add_resource(OrderList, '/orders')
-api.add_resource(Buy, '/orders/<catalog_id>')
+api.add_resource(Buy, '/buy/<catalog_id>')
 
 
 
@@ -116,3 +152,4 @@ if __name__ == '__main__':
     # reset the order DB when starting the flask app
     reset_orders()
     app.run(host = '0.0.0.0', port = 5000, debug=True)
+
