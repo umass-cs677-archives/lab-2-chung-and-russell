@@ -38,7 +38,7 @@ CATALOG_ADDRESS = 'http://' + catalog_IP + ':' + catalog_port
 def reset_orders():
     # initialize order database as a local .txt file
     with open(ORDER_FILE, mode='w') as order_log:
-        fieldnames = ['order_id', 'processing_time','is_successful','catalog_id']
+        fieldnames = ['order_id', 'processing_time','is_successful','catalog_id','title']
         writer = csv.DictWriter(order_log, fieldnames=fieldnames)
         writer.writeheader()
         order_log.close()
@@ -52,15 +52,16 @@ def get_num_orders():
     orders = get_orders_as_dict()
     return len(orders)
 
-def create_order(order_id,processing_time,is_successful,catalog_id):
+def create_order(order_id,processing_time,is_successful,catalog_id,title):
     return {'order_id': order_id,
             'processing_time': processing_time,
             'is_successful': is_successful,
-            'catalog_id': catalog_id}
+            'catalog_id': catalog_id,
+            'title': title}
 
 def write_order(order):
     with open(ORDER_FILE, mode='a') as order_log:
-        fieldnames = ['order_id', 'processing_time','is_successful','catalog_id']
+        fieldnames = ['order_id', 'processing_time','is_successful','catalog_id','title']
         writer = csv.DictWriter(order_log, fieldnames=fieldnames)
         writer.writerow(order)
 
@@ -120,9 +121,9 @@ class Buy(Resource):
             order_id = get_num_orders() + 1
             print("Bought '"+ title + "' at price of " + str(cost) + ' , stock is now ' + str(newstock))
         
-        order = create_order(order_id,processing_time,is_successful,catalog_id)
+        order = create_order(order_id,processing_time,is_successful,catalog_id,title)
         write_order(order)
-        return(order)
+        return jsonify(order)
 
 
 
@@ -149,5 +150,5 @@ api.add_resource(Buy, '/buy/<catalog_id>')
 if __name__ == '__main__':
     # reset the order DB when starting the flask app
     reset_orders()
-    app.run(host = '0.0.0.0', port = 5000, debug=True)
+    app.run(host = '0.0.0.0')
 
