@@ -1,9 +1,8 @@
 import unittest
 import urllib.request
 import json
-
+import socket
 class TestCatalog(unittest.TestCase):
-
 
     def test_query_by_topic(self):
 
@@ -31,6 +30,41 @@ class TestCatalog(unittest.TestCase):
 
         self.assertIsInstance(dict["COST"], float)
         self.assertIsInstance(dict["QUANTITY"], int)
+
+
+    def test_update(self):
+        response = urllib.request.urlopen("http://127.0.0.1:5000/query/2")
+        data = json.load(response)
+        dict = list(data.values())[0]
+        original_cost = dict["COST"]
+        original_quantity = dict["QUANTITY"]
+
+        # Make sure increase operation works correctly
+        response = urllib.request.urlopen("http://127.0.0.1:5000/update/2/cost/increase/5")
+        data = json.load(response)
+        dict = list(data.values())[0]
+        updated_cost = dict["COST"]
+
+        self.assertEqual(updated_cost - original_cost, 5)
+
+        # Make sure decrease operation works correctly
+        response = urllib.request.urlopen("http://127.0.0.1:5000/update/2/quantity/decrease/3")
+        data = json.load(response)
+        dict = list(data.values())[0]
+        updated_quantity = dict["QUANTITY"]
+
+        self.assertEqual(updated_quantity - original_quantity, -3)
+
+        # Make sure set operation works correctly
+        response = urllib.request.urlopen("http://127.0.0.1:5000/update/2/quantity/set/120")
+        data = json.load(response)
+        dict = list(data.values())[0]
+        updated_quantity = dict["QUANTITY"]
+
+        self.assertEqual(updated_quantity, 120)
+
+
+
 
 
 if __name__ == "__main__":

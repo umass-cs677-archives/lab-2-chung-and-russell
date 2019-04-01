@@ -116,5 +116,5 @@ def update(item_number, field, operation, number):
 
 if __name__ == "__main__":
 
-    app.run(use_debugger = False, use_reloader = False, debug = True)
+    app.run()
 
