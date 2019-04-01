@@ -46,9 +46,9 @@ def buy(catalog_id):
     response = requests.get("http://128.119.243.147:5000/buy/" + catalog_id).json()
 
     if response["is_successful"]:
-        return "bough book " + response["title"]
+        return "bough book " + response["title"] + "\n"
 
-    return "failed to buy book" + response["title"]
+    return "failed to buy book" + response["title"] + "\n"
 
 if __name__ == "__main__":
 
