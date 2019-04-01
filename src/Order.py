@@ -10,7 +10,7 @@ app = Flask(__name__)
 api = Api(app)
 
 ORDER_FILE = 'order_log.txt'
-SERVER_CONFIG = 'src/server_config'
+SERVER_CONFIG = 'server_config'
 
 #######################################################
 ############### Accessing Catalog server  #############
@@ -146,8 +146,6 @@ api.add_resource(OrderList, '/orders')
 api.add_resource(Buy, '/buy/<catalog_id>')
 
 
-
-# TODO setup public flask server
 if __name__ == '__main__':
     # reset the order DB when starting the flask app
     reset_orders()
