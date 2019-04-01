@@ -116,5 +116,5 @@ def update(item_number, field, operation, number):
 
 if __name__ == "__main__":
 
-    app.run()
+    app.run(host='0.0.0.0')
 
