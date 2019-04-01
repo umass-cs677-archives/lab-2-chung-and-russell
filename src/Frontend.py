@@ -46,9 +46,10 @@ def buy(catalog_id):
     response = requests.get("http://128.119.243.147:5000/buy/" + catalog_id).json()
 
     if response["is_successful"]:
-        return "bough book "
-    return("")
+        return "bough book " + response["title"]
+
+    return "failed to buy book" + response["title"]
 
 if __name__ == "__main__":
 
-    app.run(debug=True,host='0.0.0.0')
+    app.run(host='0.0.0.0')
