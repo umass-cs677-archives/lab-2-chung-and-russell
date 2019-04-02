@@ -1,16 +1,20 @@
 import unittest
 import urllib.request
 import json
+
+
+
+
 class TestCatalog(unittest.TestCase):
 
     def test_query_by_topic(self):
 
-        response = urllib.request.urlopen("http://128.119.243.164:5000/query/graduate_school")
+        response = urllib.request.urlopen("http://128.119.243.164:5002" + "/query/graduate_school")
         data = json.load(response)
         dic = {"items": {"Xen and the Art of Surviving Graduate School": 3, "Cooking for the Impatient Graduate Student":4}}
         self.assertDictEqual(data,dic)
 
-        response = urllib.request.urlopen("http://128.119.243.164:5000/query/distributed_systems")
+        response = urllib.request.urlopen("http://128.119.243.164:5002" + "/query/distributed_systems")
         data = json.load(response)
         dic = {"items": {"How to get a good grade in 677 in 20 minutes a day": 1,
                          "RPCs for Dummies": 2}}
@@ -20,7 +24,7 @@ class TestCatalog(unittest.TestCase):
 
     def test_query_by_item(self):
 
-        response = urllib.request.urlopen("http://128.119.243.164:5000/query/1")
+        response = urllib.request.urlopen("http://128.119.243.164:5002" + "/query/1")
         data = json.load(response)
         dict = list(data.values())[0]
         dict_keys = list(dict.keys())
@@ -35,14 +39,14 @@ class TestCatalog(unittest.TestCase):
 
 
     def test_update(self):
-        response = urllib.request.urlopen("http://128.119.243.164:5000/query/2")
+        response = urllib.request.urlopen("http://128.119.243.164:5002" + "/query/2")
         data = json.load(response)
         dict = list(data.values())[0]
         original_cost = dict["COST"]
         original_quantity = dict["QUANTITY"]
 
         # Make sure increase operation works correctly
-        response = urllib.request.urlopen("http://128.119.243.164:5000/update/2/cost/increase/5")
+        response = urllib.request.urlopen("http://128.119.243.164:5002" + "/update/2/cost/increase/5")
         data = json.load(response)
         dict = list(data.values())[0]
         updated_cost = dict["COST"]
@@ -51,7 +55,7 @@ class TestCatalog(unittest.TestCase):
         print("Increase operation, passed")
 
         # Make sure decrease operation works correctly
-        response = urllib.request.urlopen("http://128.119.243.164:5000/update/2/quantity/decrease/3")
+        response = urllib.request.urlopen("http://128.119.243.164:5002" + "/update/2/quantity/decrease/3")
         data = json.load(response)
         dict = list(data.values())[0]
         updated_quantity = dict["QUANTITY"]
@@ -60,7 +64,7 @@ class TestCatalog(unittest.TestCase):
         print("Decrease operation, passed")
 
         # Make sure set operation works correctly
-        response = urllib.request.urlopen("http://128.119.243.164:5000/update/2/quantity/set/120")
+        response = urllib.request.urlopen("http://128.119.243.164:5002" + "/update/2/quantity/set/120")
         data = json.load(response)
         dict = list(data.values())[0]
         updated_quantity = dict["QUANTITY"]

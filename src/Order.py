@@ -28,6 +28,7 @@ with open(SERVER_CONFIG, mode ='r') as server_file:
     catalog_dict = server_dict['Catalog']
     catalog_IP = catalog_dict['IP']
     catalog_port = catalog_dict['Port']
+    ORDER_PORT = server_dict['Order']['Port']
 
 CATALOG_ADDRESS = 'http://' + catalog_IP + ':' + catalog_port
 
@@ -150,5 +151,5 @@ api.add_resource(Buy, '/buy/<catalog_id>')
 if __name__ == '__main__':
     # reset the order DB when starting the flask app
     reset_orders()
-    app.run(host = '0.0.0.0')
+    app.run(host = '0.0.0.0', port = ORDER_PORT)
 
