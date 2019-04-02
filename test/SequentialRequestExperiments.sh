@@ -24,7 +24,7 @@ python ../src/Client.py lookup 4 1000
 
 echo Doing topic search lookup 1000 times
 python ../src/Client.py search graduate_school 1000
-python ../src/Client.py search graduate_school 1000
+python ../src/Client.py search distributed_systems 1000
 
 
 
