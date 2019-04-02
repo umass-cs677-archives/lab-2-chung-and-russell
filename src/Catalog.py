@@ -1,6 +1,19 @@
 import sqlite3
 from threading import Lock
 from flask import Flask, redirect, jsonify, abort, g
+import csv
+
+SERVER_CONFIG = 'server_config'
+with open(SERVER_CONFIG, mode ='r') as server_file:
+    server_dict = {}
+    csv_reader = csv.DictReader(server_file)
+    for row in csv_reader:
+        server_name = row['Server']
+        server_dict[server_name] = {'Machine': row['Machine'],
+                                    'IP': row['IP'],
+                                    'Port': row['Port']}
+    
+    CATALOG_PORT = server_dict['Catalog']['Port']
 
 app = Flask("catalog")
 DATABASE = 'inventory.db'
@@ -136,5 +149,5 @@ def update(item_number, field, operation, number):
 
 if __name__ == "__main__":
 
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port = CATALOG_PORT)
 
