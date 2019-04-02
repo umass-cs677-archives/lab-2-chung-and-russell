@@ -1,10 +1,27 @@
 import csv
 import requests
 import time
+import sys
 
-FRONTEND_ADDRESS = 'http://128.119.243.168:5000'
+SERVER_CONFIG = 'server_config'
+
+#######################################################
+############### Accessing Catalog server  #############
+#######################################################
 
 
+server_dict = {}
+csv_reader = csv.DictReader(open(SERVER_CONFIG, mode ='r'))
+for row in csv_reader:
+    server_name = row['Server']
+    server_dict[server_name] = {'Machine': row['Machine'],
+                                'IP': row['IP'],
+                                'Port': row['Port']}
+
+FRONTEND_IP = server_dict['Frontend']['IP']
+FRONTEND_PORT = server_dict['Frontend']['Port']
+FRONTEND_ADDRESS = 'http://128.119.243.168:' + FRONTEND_PORT
+print(FRONTEND_ADDRESS)
 
 def search(topic, print_output = True):
     search_result = requests.get(FRONTEND_ADDRESS + '/search/' + topic).text
@@ -30,33 +47,23 @@ def sequential_query(query_fun, query_arg, iterations, write_file):
             start = time.time()
             query_result = query_fun(query_arg,print_output = False)
             runtime = time.time() - start
-            output_file.write(str(runtime) + ',' + query_result)
+            output_file.write(str(runtime)+ '\n')
+
 
 
 def main():
-    help_string = "Available commands: \n  search <topic> \n  lookup <item number> \n  buy <item number> \n  quit\n"
-    interactive_session = True
-    while interactive_session:
-        prompt = input("What do you want to do? \n").split()
-        
-        if prompt[0] == 'quit':
-            interactive_session = False
-        elif prompt[0] == 'help':
-            print(help_string)
-        elif prompt[0] == 'buy':
-            try:
-                item_number = str(prompt[1])
-                if len(prompt) == 3:
-                    iterations = str(prompt[2])
-                    filename = 'buy_' + str(item_number) + '_' + str(iterations) + '.txt'
-                    sequential_query(buy,item_number,iterations,filename)
-                    print ('Sequential buy results written to ' + filename)
-                else:
-                    buy(item_number)
-            except:
-                "Error: bad input"
-        elif prompt[0] == 'search':
-            pass
+    command_fun_dict = {'buy':buy, 'search': search, 'lookup': lookup}
+    call_string = sys.argv[1]
+    call_function = command_fun_dict[call_string]
+    call_argument = sys.argv[2]
+    if len(sys.argv) > 3:
+        iterations = int(sys.argv[3])
+        filename = '../test/' + call_string + '_' + str(call_argument) + '_' + str(iterations) + '.txt'
+        sequential_query(call_function,call_argument,iterations,filename)
+        print ('Sequential ' + call_string + ' results written to ' + filename)
+    else:
+        call_function(call_argument)
+
 
 
 if __name__ == '__main__':
