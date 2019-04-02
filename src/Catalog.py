@@ -1,8 +1,22 @@
 import sqlite3
+from threading import Lock
 from flask import Flask, redirect, jsonify, abort, g
 
 app = Flask("catalog")
 DATABASE = 'inventory.db'
+
+def _get_locks():
+    """"
+    hard code locks for each row in the database
+    """
+    locks = []
+
+    for i in range(4):
+        locks.append(Lock())
+
+    return locks
+
+locks = _get_locks()
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -70,7 +84,9 @@ def query(**kwargs):
         response = jsonify(items=query_results)
 
     elif key == "item_number":
-        query_result = cursor.execute("SELECT name, cost, quantity FROM books WHERE id = ?", str(kwargs[key])).fetchall()
+
+        with locks[kwargs[key] - 1]:
+            query_result = cursor.execute("SELECT name, cost, quantity FROM books WHERE id = ?", str(kwargs[key])).fetchall()
         book_name = query_result[0]["NAME"]
         response = jsonify({book_name: _delete_keys(query_result[0],["NAME"])})
 
@@ -105,12 +121,13 @@ def update(item_number, field, operation, number):
     conn = get_db()
     cursor = conn.cursor()
 
-    if operation in ["increase", "decrease"]:
-        cursor.execute("UPDATE books SET " + field + "=" + field + valid_operation[operation] + " ? WHERE ID = ?", [number, str(item_number)])
-        conn.commit()
-    elif operation == "set":
-        cursor.execute("UPDATE books SET " + field + "= ? WHERE ID = ?", [number, str(item_number)])
-        conn.commit()
+    with locks[int(item_number) - 1]:
+        if operation in ["increase", "decrease"]:
+            cursor.execute("UPDATE books SET " + field + "=" + field + valid_operation[operation] + " ? WHERE ID = ?", [number, str(item_number)])
+            conn.commit()
+        elif operation == "set":
+            cursor.execute("UPDATE books SET " + field + "= ? WHERE ID = ?", [number, str(item_number)])
+            conn.commit()
 
     return redirect("/query/"+item_number)
 
