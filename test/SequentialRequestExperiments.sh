@@ -10,7 +10,7 @@ python ../src/Client.py buy 2 1000
 python ../src/Client.py buy 3 1000
 python ../src/Client.py buy 4 1000
 
-echo Looking up resulting stock, should be all at max(0,initial-1000)
+echo Looking up resulting stock, should be 500,200,0,0
 python ../src/Client.py lookup 1 
 python ../src/Client.py lookup 2 
 python ../src/Client.py lookup 3 
