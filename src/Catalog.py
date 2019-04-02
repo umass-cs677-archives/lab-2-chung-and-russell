@@ -95,7 +95,7 @@ def query(**kwargs):
 
     return response
 
-@app.route("/update/<item_number>/<field>/<operation>/<number>", methods=['GET','PUT'])
+@app.route("/update/<item_number>/<field>/<operation>/<int:number>", methods=['GET','PUT'])
 def update(item_number, field, operation, number):
     """
 
@@ -118,15 +118,18 @@ def update(item_number, field, operation, number):
     if operation not in valid_operation:
         abort(400)
 
+    if number < 0:
+        abort(400)
+
     conn = get_db()
     cursor = conn.cursor()
 
     with locks[int(item_number) - 1]:
         if operation in ["increase", "decrease"]:
-            cursor.execute("UPDATE books SET " + field + "=" + field + valid_operation[operation] + " ? WHERE ID = ?", [number, str(item_number)])
+            cursor.execute("UPDATE books SET " + field + "=" + field + valid_operation[operation] + " ? WHERE ID = ?", [str(number), str(item_number)])
             conn.commit()
         elif operation == "set":
-            cursor.execute("UPDATE books SET " + field + "= ? WHERE ID = ?", [number, str(item_number)])
+            cursor.execute("UPDATE books SET " + field + "= ? WHERE ID = ?", [str(number), str(item_number)])
             conn.commit()
 
     return redirect("/query/"+item_number)
