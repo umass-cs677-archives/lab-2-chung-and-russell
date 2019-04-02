@@ -70,9 +70,9 @@ def buy(catalog_id):
     response = requests.get(ORDER_BUY + catalog_id).json()
 
     if response["is_successful"]:
-        return "bough book " + response["title"] + "\n"
+        return "bought book '" + response["title"] + "'\n"
 
-    return "failed to buy book" + response["title"] + "\n"
+    return "failed to buy book '" + response["title"] + "'\n"
 
 if __name__ == "__main__":
 

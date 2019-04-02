@@ -3,25 +3,8 @@ import requests
 import time
 import sys
 
-SERVER_CONFIG = 'server_config'
+FRONTEND_ADDRESS = 'http://128.119.243.168:5003'
 
-#######################################################
-############### Accessing Catalog server  #############
-#######################################################
-
-
-server_dict = {}
-csv_reader = csv.DictReader(open(SERVER_CONFIG, mode ='r'))
-for row in csv_reader:
-    server_name = row['Server']
-    server_dict[server_name] = {'Machine': row['Machine'],
-                                'IP': row['IP'],
-                                'Port': row['Port']}
-
-FRONTEND_IP = server_dict['Frontend']['IP']
-FRONTEND_PORT = server_dict['Frontend']['Port']
-FRONTEND_ADDRESS = 'http://128.119.243.168:' + FRONTEND_PORT
-print(FRONTEND_ADDRESS)
 
 def search(topic, print_output = True):
     search_result = requests.get(FRONTEND_ADDRESS + '/search/' + topic).text
@@ -45,7 +28,7 @@ def sequential_query(query_fun, query_arg, iterations, write_file):
     with open(write_file,'w') as output_file:
         for i in range(iterations):
             start = time.time()
-            query_result = query_fun(query_arg,print_output = False)
+            query_fun(query_arg,print_output = False)
             runtime = time.time() - start
             output_file.write(str(runtime)+ '\n')
 
