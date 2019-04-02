@@ -58,7 +58,7 @@ def main():
     call_argument = sys.argv[2]
     if len(sys.argv) > 3:
         iterations = int(sys.argv[3])
-        filename = '../test/' + call_string + '_' + str(call_argument) + '_' + str(iterations) + '.txt'
+        filename = '../test/experiment_results/' + call_string + '_' + str(call_argument) + '_' + str(iterations) + '.txt'
         sequential_query(call_function,call_argument,iterations,filename)
         print ('Sequential ' + call_string + ' results written to ' + filename)
     else:
