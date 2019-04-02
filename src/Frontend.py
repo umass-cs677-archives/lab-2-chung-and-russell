@@ -1,13 +1,37 @@
 from flask import Flask
 import requests
+import csv
 
 app = Flask("frontend")
+
+SERVER_CONFIG = 'server_config'
+
+#######################################################
+############### Accessing Catalog server  #############
+#######################################################
+
+with open(SERVER_CONFIG, mode ='r') as server_file:
+    server_dict = {}
+    csv_reader = csv.DictReader(server_file)
+    for row in csv_reader:
+        server_name = row['Server']
+        server_dict[server_name] = {'Machine': row['Machine'],
+                                    'IP': row['IP'],
+                                    'Port': row['Port']}
+    
+    CATALOG_PORT = server_dict['Catalog']['Port']
+    ORDER_PORT = server_dict['Order']['Port']
+    FRONTEND_PORT = server_dict['Frontend']['Port']
+
+
+CATALOG_QUERY = 'http://128.119.243.164:' + CATALOG_PORT + '/query/'
+ORDER_BUY = 'http://128.119.243.147:' + ORDER_PORT + '/buy/'
 
 
 
 @app.route("/search/<topic>", methods = ["GET"])
 def search(topic):
-    books = requests.get("http://128.119.243.164:5000/query/" + topic).json()
+    books = requests.get(CATALOG_QUERY + topic).json()
 
     search_result = []
 
@@ -43,7 +67,7 @@ def lookup(item_number):
 
 @app.route("/buy/<catalog_id>")
 def buy(catalog_id):
-    response = requests.get("http://128.119.243.147:5000/buy/" + catalog_id).json()
+    response = requests.get(ORDER_BUY + catalog_id).json()
 
     if response["is_successful"]:
         return "bough book " + response["title"] + "\n"
@@ -52,4 +76,4 @@ def buy(catalog_id):
 
 if __name__ == "__main__":
 
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0',FRONTEND_PORT)
