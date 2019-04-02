@@ -47,7 +47,7 @@ def search(topic):
 
 @app.route("/lookup/<item_number>")
 def lookup(item_number):
-    books = requests.get("http://128.119.243.164:5000/query/" + item_number).json()
+    books = requests.get(CATALOG_QUERY + item_number).json()
 
     search_result = []
 
@@ -76,4 +76,4 @@ def buy(catalog_id):
 
 if __name__ == "__main__":
 
-    app.run(host='0.0.0.0',FRONTEND_PORT)
+    app.run(host='0.0.0.0',port = FRONTEND_PORT)

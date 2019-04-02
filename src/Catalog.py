@@ -2,6 +2,7 @@ import sqlite3
 from flask import Flask, redirect, jsonify, abort, g
 import csv
 
+SERVER_CONFIG = 'server_config'
 with open(SERVER_CONFIG, mode ='r') as server_file:
     server_dict = {}
     csv_reader = csv.DictReader(server_file)
