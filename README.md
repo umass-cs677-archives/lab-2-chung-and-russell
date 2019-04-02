@@ -1,3 +1,6 @@
 # 677 Lab 2
 
-To run TestCatalog.py, make sure all servers are running and execute the following command: python3 TestCatalog.py
+To run Catalog server, execute following commands on elnux2
+
+export FLASK_APP=Catalog.py
+python3 -m flask run --host=128.119.243.164
