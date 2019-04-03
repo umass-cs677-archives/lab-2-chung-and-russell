@@ -12,6 +12,8 @@ api = Api(app)
 ORDER_FILE = 'order_log.txt'
 SERVER_CONFIG = 'server_config'
 
+PERIODIC_UPDATE = False
+
 #######################################################
 ############### Accessing Catalog server  #############
 #######################################################
@@ -42,7 +44,6 @@ def reset_orders():
         fieldnames = ['order_id', 'processing_time','is_successful','catalog_id','title']
         writer = csv.DictWriter(order_log, fieldnames=fieldnames)
         writer.writeheader()
-        order_log.close()
 
 def get_orders_as_dict():
     with open(ORDER_FILE, mode='r') as csv_file:
@@ -95,6 +96,10 @@ def decrement_catalog_server(catalog_id):
 
     return quantity
 
+def restock_catalog_server(catalog_id):
+    r = requests.get(CATALOG_ADDRESS + '/update/' + catalog_id + '/quantity/increase/300')
+
+
 
 ######################################################
 ################ Setup REST resources ################
@@ -113,7 +118,9 @@ class Buy(Resource):
             # done querying the catalog server, add an order to the order DB
             order_id = get_num_orders() + 1
             is_successful = False
-            
+            if PERIODIC_UPDATE:
+                restock_catalog_server(catalog_id)
+
         else:
             #decrement stock by 1
             newstock = decrement_catalog_server(catalog_id)
