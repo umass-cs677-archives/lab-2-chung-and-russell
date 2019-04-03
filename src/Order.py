@@ -84,7 +84,7 @@ def query_catalog_server(catalog_id):
 
     return quantity,title
 
-# decrements the catalog server, returns the new quantity and buying price of item
+# decrements the catalog server, returns the new quantity 
 def decrement_catalog_server(catalog_id):
     r = requests.get(CATALOG_ADDRESS + '/update/' + catalog_id + '/quantity/decrease/1')
     decrement_result = r.json()
@@ -93,7 +93,7 @@ def decrement_catalog_server(catalog_id):
     quantity = int(item_dict['QUANTITY'])
     cost = int(item_dict['COST'])
 
-    return quantity,cost
+    return quantity
 
 
 ######################################################
@@ -113,15 +113,17 @@ class Buy(Resource):
             # done querying the catalog server, add an order to the order DB
             order_id = get_num_orders() + 1
             is_successful = False
-            print("Failed to buy '" + title + "', stock was at 0")
             
         else:
             #decrement stock by 1
-            newstock,cost = decrement_catalog_server(catalog_id)
+            newstock = decrement_catalog_server(catalog_id)
             is_successful = True
             order_id = get_num_orders() + 1
-            print("Bought '"+ title + "' at price of " + str(cost) + ' , stock is now ' + str(newstock))
-        
+            stockChange = stock - newstock
+            if stockChange != 1:
+                errorString = " , stock erroneously changed by " + str(stockChange)
+                print("Bought '"+ title + "' , stock erroneously changed by " + str(stockChange))
+                title = title + errorString
         order = create_order(order_id,processing_time,is_successful,catalog_id,title)
         write_order(order)
         return jsonify(order)

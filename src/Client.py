@@ -24,12 +24,18 @@ def buy(catalog_id, print_output = True):
         print(buy_result)
     return buy_result
 
-def sequential_query(query_fun, query_arg, iterations, write_file):
-    with open(write_file,'w') as output_file:
+def sequential_query(query_fun, query_arg, iterations, write_file, client_name = ''):
+    # if clients are named, then also save query printed outputs to file
+    if len(client_name) > 0 :
+        printed_file = open(write_file + '_' + 'printed.txt','w')
+
+    with open(write_file + '.txt','w') as output_file:
         for i in range(iterations):
             start = time.time()
-            query_fun(query_arg,print_output = False)
+            output = query_fun(query_arg,print_output = False)
             runtime = time.time() - start
+            if len(client_name) > 0 :
+                printed_file.write(client_name + ' ' + output + '\n')
             output_file.write(str(runtime)+ '\n')
 
 
@@ -41,8 +47,13 @@ def main():
     call_argument = sys.argv[2]
     if len(sys.argv) > 3:
         iterations = int(sys.argv[3])
-        filename = '../test/experiment_results/' + call_string + '_' + str(call_argument) + '_' + str(iterations) + '.txt'
-        sequential_query(call_function,call_argument,iterations,filename)
+        if len(sys.argv) == 5:
+            client_name = str(sys.argv[4])
+        else:
+            client_name = ''
+        filename = '../test/experiment_results/' + client_name + call_string + '_' + str(call_argument) + '_' + str(iterations) 
+
+        sequential_query(call_function,call_argument,iterations,filename,client_name)
         print ('Sequential ' + call_string + ' results written to ' + filename)
     else:
         call_function(call_argument)
