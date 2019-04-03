@@ -109,7 +109,7 @@ class Buy(Resource):
         start = time.time()
         stock,title = query_catalog_server(catalog_id)
         processing_time = time.time() - start
-        if stock == 0:
+        if stock <= 0:
             # done querying the catalog server, add an order to the order DB
             order_id = get_num_orders() + 1
             is_successful = False
@@ -121,7 +121,10 @@ class Buy(Resource):
             order_id = get_num_orders() + 1
             stockChange = stock - newstock
             if stockChange != 1:
-                errorString = " , stock erroneously changed by " + str(stockChange)
+                if newstock < 0:
+                    errorString = ", stock is now " + str(newstock)
+                else:
+                    errorString = " ,  " + str(stockChange) + " other clients bought items in between query and update"
                 print("Bought '"+ title + "' , stock erroneously changed by " + str(stockChange))
                 title = title + errorString
         order = create_order(order_id,processing_time,is_successful,catalog_id,title)
