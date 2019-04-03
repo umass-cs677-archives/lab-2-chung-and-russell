@@ -76,6 +76,7 @@ There should be 2 fails for this one.
     Quantity: 0
 
 Finally, we test the search by topic function for both topics.
+
     Searching topic graduate_school
     Name: Xen and the Art of Surviving Graduate School Item ID: 3
     Name: Cooking for the Impatient Graduate Student Item ID: 4
