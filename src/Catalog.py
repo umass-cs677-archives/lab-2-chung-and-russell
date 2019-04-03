@@ -137,9 +137,20 @@ def update(item_number, field, operation, number):
     cursor = conn.cursor()
 
     with locks[int(item_number) - 1]:
-        if operation in ["increase", "decrease"]:
+        if operation == "increase":
             cursor.execute("UPDATE books SET " + field + "=" + field + valid_operation[operation] + " ? WHERE ID = ?", [str(number), item_number])
             conn.commit()
+
+        elif operation == "decrease":
+            # Check the value again before decrement
+            query_result = cursor.execute("SELECT cost, quantity FROM books WHERE id = ?", item_number).fetchall()
+
+            if query_result[0][field.upper()] > 0:
+                cursor.execute(
+                    "UPDATE books SET " + field + "=" + field + valid_operation[operation] + " ? WHERE ID = ?",
+                    [str(number), item_number])
+                conn.commit()
+
         elif operation == "set":
             cursor.execute("UPDATE books SET " + field + "= ? WHERE ID = ?", [str(number), str(item_number)])
             conn.commit()
