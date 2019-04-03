@@ -10,5 +10,9 @@ python ../src/Client.py buy 1 $1 4conctest &
 python ../src/Client.py buy 1 $1 5conctest
 
 wget -qO- http://128.119.243.164:5003
+sleep 1
 FAILED=$(grep -r 'conctest failed' | wc -l)
-echo $FAILED buys failed, correct amount is $EXPECTED failures
+SUCCEEDED=$(grep -r 'conctest bought' | wc -l)
+
+clear
+echo $FAILED buys failed and $SUCCEEDED buys succeeded
