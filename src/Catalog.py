@@ -136,6 +136,8 @@ def update(item_number, field, operation, number):
     conn = get_db()
     cursor = conn.cursor()
 
+    success = True
+
     with locks[int(item_number) - 1]:
         if operation == "increase":
             cursor.execute("UPDATE books SET " + field + "=" + field + valid_operation[operation] + " ? WHERE ID = ?", [str(number), item_number])
@@ -150,6 +152,8 @@ def update(item_number, field, operation, number):
                     "UPDATE books SET " + field + "=" + field + valid_operation[operation] + " ? WHERE ID = ?",
                     [str(number), item_number])
                 conn.commit()
+            else:
+                success = False
 
         elif operation == "set":
             cursor.execute("UPDATE books SET " + field + "= ? WHERE ID = ?", [str(number), str(item_number)])
@@ -157,6 +161,8 @@ def update(item_number, field, operation, number):
 
         query_result = cursor.execute("SELECT name, cost, quantity FROM books WHERE id = ?", item_number).fetchall()
         book_name = query_result[0]["NAME"]
+        query_result[0]["SUCCESS"] = success
+
         response = jsonify({book_name: _delete_keys(query_result[0], ["NAME"])})
 
     return response
