@@ -95,13 +95,12 @@ def query(**kwargs):
         query_results = cursor.execute("SELECT name, id FROM books WHERE topic = ?", topic).fetchall()
         query_results = _pair_results(query_results, [("NAME", "ID")])
         response = jsonify(items=query_results)
-
     elif key == "item_number":
 
         with locks[kwargs[key] - 1]:
             query_result = cursor.execute("SELECT name, cost, quantity FROM books WHERE id = ?", str(kwargs[key])).fetchall()
-        book_name = query_result[0]["NAME"]
-        response = jsonify({book_name: _delete_keys(query_result[0],["NAME"])})
+            book_name = query_result[0]["NAME"]
+            response = jsonify({book_name: _delete_keys(query_result[0],["NAME"])})
 
     else:
         return "no query criteria specified"
@@ -139,13 +138,17 @@ def update(item_number, field, operation, number):
 
     with locks[int(item_number) - 1]:
         if operation in ["increase", "decrease"]:
-            cursor.execute("UPDATE books SET " + field + "=" + field + valid_operation[operation] + " ? WHERE ID = ?", [str(number), str(item_number)])
+            cursor.execute("UPDATE books SET " + field + "=" + field + valid_operation[operation] + " ? WHERE ID = ?", [str(number), item_number])
             conn.commit()
         elif operation == "set":
             cursor.execute("UPDATE books SET " + field + "= ? WHERE ID = ?", [str(number), str(item_number)])
             conn.commit()
 
-    return redirect("/query/"+item_number)
+        query_result = cursor.execute("SELECT name, cost, quantity FROM books WHERE id = ?", item_number).fetchall()
+        book_name = query_result[0]["NAME"]
+        response = jsonify({book_name: _delete_keys(query_result[0], ["NAME"])})
+
+    return response
 
 if __name__ == "__main__":
 
