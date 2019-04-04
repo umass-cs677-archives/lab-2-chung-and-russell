@@ -2,7 +2,21 @@
 
 # Server setup
 
-Our configuration requires the order server on elnux1, catalog server on elnux2, and frontend server on elnux3.  This can be done manually, but there is a shell script in this directory that will use ssh to setup all 3 concurrently:
+Our configuration requires the order server on elnux1, catalog server on elnux2, and frontend server on elnux3.  This can be done manually:
+    
+    ssh username@elnux1.cs.umass.edu
+    cd cs677/lab-2-chung-and-russell
+    python Order.py
+    
+    ssh username@elnux2.cs.umass.edu
+    cd cs677/lab-2-chung-and-russell
+    python Catalog.py
+    
+    ssh username@elnux3.cs.umass.edu
+    cd cs677/lab-2-chung-and-russell
+    python Frontend.py
+    
+There is a shell script in this directory that will use ssh to setup all 3 concurrently:
 
     ./server_startup.sh [elnux username]
     
