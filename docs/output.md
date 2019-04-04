@@ -1,8 +1,12 @@
-The following the annotated output of running ./TestClientFunctions.sh in the /test folder.  Make sure the 3-tier servers are up and running, this can be done quickly by running the following command from the src folder:
+The following the annotated output of running ./TestClientFunctions.sh in the /test folder.  Make sure the 3-tier servers are up and running, this can be done quickly by running the following command from the src folder.  Note that the following script requires SSH into elnux1,elnux2, and elnux3 to be done without password (see https://askubuntu.com/questions/46930/how-can-i-set-up-password-less-ssh-login)
 
     ./server_startup.sh [edlab ssh username]
     
-For each time, we test buy and lookup.  Buy is called 5 times, with the initial stock varying from 6 to 3.  Lookup is called after buying 5 times, to ensure the remaining stock is max(0,initial - 5)
+The above script also assumes the following directory exists:
+    
+    cs677/lab-2-chung-and-russell/src
+    
+For each item, we test buy and lookup.  Buy is called 5 times, with the initial stock varying from 6 to 3.  Lookup is called after buying 5 times, to ensure the remaining stock is max(0,initial - 5)
 
     Buying first item 5 times, starting at stock 6
     {"How to get a good grade in 677 in 20 minutes a day":{"COST":120.0,"QUANTITY":6}}
