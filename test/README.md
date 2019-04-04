@@ -11,7 +11,9 @@ The following distributed machine setup is REQUIRED:
     elnux3@cs.umass.edu/cs677/lab-2-chung-and-russell/src
     python Frontend.py
     
-This can be done with the shellscript in ../src/server_startup.sh as described in its README.
+This can be done with the shellscript in ../src/server_startup.sh as described in its README.  If there is a permissions error, chmod all files in this directory:
+
+    chmod -R +x *
 
 Once the 3 servers are setup, run the following script to automatically run all the tests described in our test doc:
 
