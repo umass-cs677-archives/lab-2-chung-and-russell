@@ -14,7 +14,7 @@ Make sure that you can ssh to username@elnux1.cs.umass.edu and other elnux serve
 
 How to call client from command line:
 
-  python Client.py [operation] [operation argument] [number of sequential requests (OPTIONAL)] [client name (OPTIONAL)] [-hide]
+    python Client.py [operation] [operation argument] [number of sequential requests (OPTIONAL)] [client name (OPTIONAL)] [-hide]
 
 List of operations and their corresponding arguments:
 
