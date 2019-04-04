@@ -1,8 +1,3 @@
 # 677 Lab 2
 
-To run Catalog server, execute following commands on elnux2
-
-```
-export FLASK_APP=Catalog.py
-python3 -m flask run --host=128.119.243.164
-```
+See the README in /src/ for how to setup the server and spawn a client.  See the README in /test/ for how to replicate tests.
