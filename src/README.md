@@ -6,13 +6,15 @@ Our configuration requires the order server on elnux1, catalog server on elnux2,
 
     ./server_startup.sh [elnux username]
     
-Make sure that you can ssh to username@elnux1.cs.umass.edu and other elnux servers without needing to type in a password (see https://stackoverflow.com/questions/241588/how-to-automate-ssh-login-with-password)
+Make sure that you can ssh to username@elnux1.cs.umass.edu and other elnux servers without needing to type in a password (see https://askubuntu.com/questions/46930/how-can-i-set-up-password-less-ssh-login), and that the directory below exists:
+
+    cs677/lab-2-chung-and-russell/src
 
 # Accessing Frontend with client
 
 How to call client from command line:
 
-  python Client.py [operation] [operation argument] [number of sequential requests (OPTIONAL)]
+    python Client.py [operation] [operation argument] [number of sequential requests (OPTIONAL)] [client name (OPTIONAL)] [-hide]
 
 List of operations and their corresponding arguments:
 
