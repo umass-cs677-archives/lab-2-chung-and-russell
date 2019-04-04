@@ -1,9 +1,6 @@
 import unittest
-import urllib.request
 import requests
 import json
-
-
 
 
 class TestOrder(unittest.TestCase):
@@ -14,8 +11,8 @@ class TestOrder(unittest.TestCase):
                   "Xen and the Art of Surviving Graduate School",
                   "Cooking for the Impatient Graduate Student"]
         
-        responses = [json.load(urllib.request.urlopen("http://128.119.243.147:5001/buy/" + item_id))
-                    for item_id in ['1','2','3','4']]
+        responses = [requests.get("http://128.119.243.147:5001/buy/" + item_id).json()
+                     for item_id in ['1','2','3','4']]
         
         response_titles = [response['title'] for response in responses]
 
@@ -26,7 +23,7 @@ class TestOrder(unittest.TestCase):
 
     def test_return_types(self):
 
-        data = json.load(urllib.request.urlopen("http://128.119.243.147:5001/buy/1"))
+        data = requests.get("http://128.119.243.147:5001/buy/1").json()
         dict_keys = list(data.keys())
 
         self.assertIn("catalog_id", dict_keys)
@@ -48,14 +45,14 @@ class TestOrder(unittest.TestCase):
         # set stock to 1
         requests.get("http://128.119.243.164:5002/update/1/quantity/set/1")
 
-        data1 = json.load(urllib.request.urlopen("http://128.119.243.147:5001/buy/1"))
+        data1 = requests.get("http://128.119.243.147:5001/buy/1").json()
         first_buy = data1['is_successful']
         self.assertTrue(first_buy)
 
         print("Successful buy passed")
 
         # stock is now 0, next buy should fail
-        data2 = json.load(urllib.request.urlopen("http://128.119.243.147:5001/buy/1"))
+        data2 = requests.get("http://128.119.243.147:5001/buy/1").json()
         second_buy = data2['is_successful']
         self.assertFalse(second_buy)
         print("Unsuccessful buy passed")

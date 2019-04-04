@@ -92,12 +92,11 @@ def decrement_catalog_server(catalog_id):
     # updating by quantity gives a json of type {title:{'COST':value, 'QUANTITY':value}}
     item_dict = list(decrement_result.values())[0]
     quantity = int(item_dict['QUANTITY'])
-    cost = int(item_dict['COST'])
-
-    return quantity
+    success = item_dict['SUCCESS']
+    return quantity,success
 
 def restock_catalog_server(catalog_id):
-    r = requests.get(CATALOG_ADDRESS + '/update/' + catalog_id + '/quantity/increase/300')
+    requests.get(CATALOG_ADDRESS + '/update/' + catalog_id + '/quantity/increase/300')
 
 
 
@@ -123,13 +122,12 @@ class Buy(Resource):
 
         else:
             #decrement stock by 1
-            newstock = decrement_catalog_server(catalog_id)
-            is_successful = True
+            newstock,is_successful = decrement_catalog_server(catalog_id)
             order_id = get_num_orders() + 1
             stockChange = stock - newstock
             if stockChange != 1:
                 if newstock < 0:
-                    errorString = ", stock is now " + str(newstock)
+                    errorString = ", stock is negative at " + str(newstock)
                 else:
                     errorString = " ,  " + str(stockChange) + " other clients bought items in between query and update"
                 print("Bought '"+ title + "' , stock erroneously changed by " + str(stockChange))
