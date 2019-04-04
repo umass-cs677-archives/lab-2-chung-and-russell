@@ -37,6 +37,7 @@ class TestCatalog(unittest.TestCase):
 
 
     def test_update(self):
+        requests.get("http://128.119.243.164:5002" + "/update/2/quantity/set/5")
         response = requests.get("http://128.119.243.164:5002" + "/query/2")
         data = response.json()
         dict = list(data.values())[0]
