@@ -11,7 +11,13 @@ The following distributed machine setup is REQUIRED:
     elnux3@cs.umass.edu/cs677/lab-2-chung-and-russell/src
     python Frontend.py
     
-This can be done with the shellscript in ../src/server_startup.sh as described in its README.
+This can be done with the shellscript in ../src/server_startup.sh as described in its README.  If there is a permissions error, chmod all files in this directory:
+
+    chmod -R +x *
+
+Once the 3 servers are setup, run the following script to automatically run all the tests described in our test doc:
+
+    ./run_tests.sh
 
 run_tests.sh will run each of the following 4 tests, and save their outputs to test_outputs:
 
@@ -21,4 +27,5 @@ run_tests.sh will run each of the following 4 tests, and save their outputs to t
 3.  TestCatalogpy: unit tests on catalog server.
 4.  test_concurrent.sh: spawns 5 clients to concurrently make buy requests, verify test by inspecting output.
 
-All other shell scripts are performance experiments.
+
+All other shell scripts are performance experiments.  
