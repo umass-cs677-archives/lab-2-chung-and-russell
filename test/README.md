@@ -11,22 +11,14 @@ The following distributed machine setup is REQUIRED:
     elnux3@cs.umass.edu/cs677/lab-2-chung-and-russell/src
     python Frontend.py
     
-Running client processes on machine elnux7 is SUGGESTED:
+This can be done with the shellscript in ../src/server_startup.sh as described in its README.
 
-    elnux7@cs.umass.edu/cs677/lab-2-chung-and-russell/src
-    python Client.py [command] [command arg]
-    
-The following experiments can be executed as shell scripts from the test directory:
+run_tests.sh will run each of the following 4 tests, and save their outputs to test_outputs:
 
-    elnux7@cs.umass.edu/cs677/lab-2-chung-and-russell/test
-    chmod +x SequentialRequestExperiments.sh
-    chmod +x TestClientFunctions.sh
-    
-    ./SequentialRequestExperiments.sh
-    ./TestClientFunctions.sh
-    
-Can also save output of .sh files to txt:
+1. TestClientFunctions.sh: executes all 3 frontend operations from a single client with various scenarios, verify test by inspecting output.
 
-    ./SequentialRequestExperiments.sh>seq_output.txt
-    ./TestClientFunctions.sh>client_output.txt
-    
+2.  TestOrder.py: unit tests on order server.
+3.  TestCatalogpy: unit tests on catalog server.
+4.  test_concurrent.sh: spawns 5 clients to concurrently make buy requests, verify test by inspecting output.
+
+All other shell scripts are performance experiments.
