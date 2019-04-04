@@ -19,7 +19,7 @@ class TestOrder(unittest.TestCase):
         for (title,response_title) in zip(titles,response_titles):
             self.assertMultiLineEqual(title,response_title)
 
-        print("Buy fetches correct title, passed")
+        print("Buy fetches correct book title, passed")
 
     def test_return_types(self):
 
@@ -31,7 +31,7 @@ class TestOrder(unittest.TestCase):
         self.assertIn("order_id", dict_keys)
         self.assertIn("processing_time", dict_keys)
         self.assertIn("title", dict_keys)
-        print("Buy return fields, passed")
+        print("Buy returns correct keys, passed")
 
         self.assertIsInstance(data["catalog_id"], str)
         self.assertIsInstance(data["is_successful"], bool)
@@ -49,13 +49,13 @@ class TestOrder(unittest.TestCase):
         first_buy = data1['is_successful']
         self.assertTrue(first_buy)
 
-        print("Successful buy passed")
+        print("Successful buy with positive stock passed")
 
         # stock is now 0, next buy should fail
         data2 = requests.get("http://128.119.243.147:5001/buy/1").json()
         second_buy = data2['is_successful']
         self.assertFalse(second_buy)
-        print("Unsuccessful buy passed")
+        print("Unsuccessful buy with zero stock passed")
 
 
 

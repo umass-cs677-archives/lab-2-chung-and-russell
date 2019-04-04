@@ -3,8 +3,6 @@ import requests
 import json
 
 
-
-
 class TestCatalog(unittest.TestCase):
 
     def test_query_by_topic(self):
@@ -20,7 +18,7 @@ class TestCatalog(unittest.TestCase):
                          "RPCs for Dummies": 2}}
 
         self.assertDictEqual(data, dic)
-        print("Query message by topic, passed")
+        print("Querying message by topic correct dictionaries, passed")
 
     def test_query_by_item(self):
 
@@ -31,7 +29,7 @@ class TestCatalog(unittest.TestCase):
 
         self.assertIn("COST", dict_keys)
         self.assertIn("QUANTITY", dict_keys)
-        print("Query message by item, passed")
+        print("Query message by item correct keys, passed")
 
         self.assertIsInstance(dict["COST"], float)
         self.assertIsInstance(dict["QUANTITY"], int)
@@ -52,7 +50,7 @@ class TestCatalog(unittest.TestCase):
         updated_cost = dict["COST"]
 
         self.assertEqual(updated_cost - original_cost, 5)
-        print("Increase operation, passed")
+        print("Increase operation correct amount, passed")
 
         # Make sure decrease operation works correctly
         response = requests.get("http://128.119.243.164:5002" + "/update/2/quantity/decrease/3")
@@ -61,7 +59,7 @@ class TestCatalog(unittest.TestCase):
         updated_quantity = dict["QUANTITY"]
 
         self.assertEqual(updated_quantity - original_quantity, -3)
-        print("Decrease operation, passed")
+        print("Decrease operation correct amount, passed")
 
         # Make sure set operation works correctly
         response = requests.get("http://128.119.243.164:5002" + "/update/2/quantity/set/120")
@@ -70,7 +68,7 @@ class TestCatalog(unittest.TestCase):
         updated_quantity = dict["QUANTITY"]
 
         self.assertEqual(updated_quantity, 120)
-        print("Set operation, passed")
+        print("Set operation correct amount, passed")
 
 
 
