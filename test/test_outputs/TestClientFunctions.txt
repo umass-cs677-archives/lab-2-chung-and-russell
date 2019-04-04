@@ -1,0 +1,77 @@
+Buying first item 5 times, starting at stock 6
+{"How to get a good grade in 677 in 20 minutes a day":{"COST":120.0,"QUANTITY":6,"SUCCESS":true}}
+bought book 'How to get a good grade in 677 in 20 minutes a day'
+
+bought book 'How to get a good grade in 677 in 20 minutes a day'
+
+bought book 'How to get a good grade in 677 in 20 minutes a day'
+
+bought book 'How to get a good grade in 677 in 20 minutes a day'
+
+bought book 'How to get a good grade in 677 in 20 minutes a day'
+
+Looking up final stock of first item
+Name: How to get a good grade in 677 in 20 minutes a day
+Cost: 120.0
+Quantity: 1
+
+Buying second item 5 times, starting at stock 5
+{"RPCs for Dummies":{"COST":185.0,"QUANTITY":5,"SUCCESS":true}}
+bought book 'RPCs for Dummies'
+
+bought book 'RPCs for Dummies'
+
+bought book 'RPCs for Dummies'
+
+bought book 'RPCs for Dummies'
+
+bought book 'RPCs for Dummies'
+
+Looking up final stock of second item
+Name: RPCs for Dummies
+Cost: 185.0
+Quantity: 0
+
+Buying third item 5 times, starting at stock 4
+{"Xen and the Art of Surviving Graduate School":{"COST":150.0,"QUANTITY":4,"SUCCESS":true}}
+bought book 'Xen and the Art of Surviving Graduate School'
+
+bought book 'Xen and the Art of Surviving Graduate School'
+
+bought book 'Xen and the Art of Surviving Graduate School'
+
+bought book 'Xen and the Art of Surviving Graduate School'
+
+failed to buy book 'Xen and the Art of Surviving Graduate School'
+
+Looking up final stock of third item
+Name: Xen and the Art of Surviving Graduate School
+Cost: 150.0
+Quantity: 0
+
+Buying fourth item 5 times, starting at stock 3
+{"Cooking for the Impatient Graduate Student":{"COST":140.0,"QUANTITY":3,"SUCCESS":true}}
+bought book 'Cooking for the Impatient Graduate Student'
+
+bought book 'Cooking for the Impatient Graduate Student'
+
+bought book 'Cooking for the Impatient Graduate Student'
+
+failed to buy book 'Cooking for the Impatient Graduate Student'
+
+failed to buy book 'Cooking for the Impatient Graduate Student'
+
+Looking up final stock of fourth item
+Name: Cooking for the Impatient Graduate Student
+Cost: 140.0
+Quantity: 0
+
+Searching topic graduate_school
+Name: Xen and the Art of Surviving Graduate School Item ID: 3
+Name: Cooking for the Impatient Graduate Student Item ID: 4
+
+Searching topic distributed_systems
+Name: RPCs for Dummies Item ID: 2
+Name: How to get a good grade in 677 in 20 minutes a day Item ID: 1
+
+Done testing basic client operations!

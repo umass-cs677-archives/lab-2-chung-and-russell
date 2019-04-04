@@ -1,0 +1,6 @@
+Query message by item correct keys, passed
+Return types are correct
+Querying message by topic correct dictionaries, passed
+Increase operation correct amount, passed
+Decrease operation correct amount, passed
+Set operation correct amount, passed

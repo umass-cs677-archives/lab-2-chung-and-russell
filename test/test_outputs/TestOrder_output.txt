@@ -1,0 +1,5 @@
+Buy fetches correct book title, passed
+Successful buy with positive stock passed
+Unsuccessful buy with zero stock passed
+Buy returns correct keys, passed
+Return types are correct

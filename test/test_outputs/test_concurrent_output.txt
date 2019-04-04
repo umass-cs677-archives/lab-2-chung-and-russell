@@ -1,0 +1,11 @@
+Setting stock to 300, 5 clients concurrently making 100 buys each
+{"How to get a good grade in 677 in 20 minutes a day":{"COST":120.0,"QUANTITY":300,"SUCCESS":true}}
+0.0557011461258
+0.0559294223785
+0.0563061785698
+0.0562772130966
+0.0564493703842
+200 buys failed and 300 buys succeeded
+Name: How to get a good grade in 677 in 20 minutes a day
+Cost: 120.0
+Quantity: 0
