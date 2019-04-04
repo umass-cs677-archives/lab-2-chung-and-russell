@@ -13,6 +13,10 @@ The following distributed machine setup is REQUIRED:
     
 This can be done with the shellscript in ../src/server_startup.sh as described in its README.
 
+Once the 3 servers are setup, run the following script to automatically run all the tests described in our test doc:
+
+    ./run_tests.sh
+
 run_tests.sh will run each of the following 4 tests, and save their outputs to test_outputs:
 
 1. TestClientFunctions.sh: executes all 3 frontend operations from a single client with various scenarios, verify test by inspecting output.
@@ -21,4 +25,5 @@ run_tests.sh will run each of the following 4 tests, and save their outputs to t
 3.  TestCatalogpy: unit tests on catalog server.
 4.  test_concurrent.sh: spawns 5 clients to concurrently make buy requests, verify test by inspecting output.
 
-All other shell scripts are performance experiments.
+
+All other shell scripts are performance experiments.  
